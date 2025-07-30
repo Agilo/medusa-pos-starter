@@ -238,7 +238,7 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
           }}
         >
           <View
-            className={clx('bg-white rounded-2xl w-full overflow-hidden shrink grow-0', containerClassName)}
+            className={clx('bg-white rounded-t-2xl w-full overflow-hidden shrink grow-0', containerClassName)}
             style={{
               paddingBottom: safeAreaInsets.bottom,
             }}

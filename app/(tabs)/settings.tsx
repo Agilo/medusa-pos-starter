@@ -33,7 +33,7 @@ export default function SettingsScreen() {
   };
 
   return (
-    <LayoutWithScroll>
+    <LayoutWithScroll contentContainerClassName="pb-0">
       <View style={{ paddingBottom: bottomTabBarHeight + 10 }}>
         <Text className="text-4xl mb-6">Settings</Text>
 
