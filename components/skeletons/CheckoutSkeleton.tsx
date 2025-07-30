@@ -3,7 +3,7 @@ import { Text } from '@/components/ui/Text';
 import { View } from 'react-native';
 
 export const CheckoutSkeleton = () => (
-  <Layout>
+  <Layout className="pb-2.5">
     <Text className="text-4xl mb-6">Checkout</Text>
 
     {/* Order Items */}

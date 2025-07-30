@@ -95,7 +95,7 @@ export default function CheckoutScreen() {
 
   if (!draftOrder.data?.items.length) {
     return (
-      <Layout>
+      <Layout className="pb-2.5">
         <Text className="text-4xl">Checkout</Text>
         <View className="flex-1 items-center gap-1 justify-center">
           <ShoppingCart size={24} />
@@ -127,7 +127,7 @@ export default function CheckoutScreen() {
 
   return (
     <>
-      <Layout>
+      <Layout className="pb-2.5">
         <Text className="text-4xl mb-6">Checkout</Text>
 
         <FlashList
