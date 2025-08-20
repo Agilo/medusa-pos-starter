@@ -4,8 +4,11 @@ import {
   useCurrentDraftOrder,
   useDraftOrderOrOrder,
 } from '@/api/hooks/draft-orders';
+import { CreditCard } from '@/components/icons/creadit-card';
 import { ShoppingCart } from '@/components/icons/shopping-cart';
+import { Wallet } from '@/components/icons/wallet';
 import { InfoBanner } from '@/components/InfoBanner';
+import { PaymentSelection } from '@/components/PaymentSelection';
 import { CheckoutSkeleton } from '@/components/skeletons/CheckoutSkeleton';
 import { Button } from '@/components/ui/Button';
 import { Dialog } from '@/components/ui/Dialog';
@@ -64,6 +67,8 @@ export default function CheckoutScreen() {
     ({ item }) => <DraftOrderItem item={item} />,
     [],
   );
+
+  const [step, setStep] = React.useState('details');
 
   const items = draftOrder.data?.items || [];
 
@@ -126,49 +131,120 @@ export default function CheckoutScreen() {
   const customerPhone = draftOrder.data.customer?.phone;
   const isPosDefaultCustomer = !customerEmail || customerEmail === DRAFT_ORDER_DEFAULT_CUSTOMER_EMAIL;
 
+  const PAYMENT_METHODS = [
+    {
+      id: 'cash',
+      label: 'Cash',
+      description: 'Pay with cash on delivery',
+      icon: <Wallet size={20} />,
+    },
+    {
+      id: 'card',
+      label: 'Credit card',
+      description: 'Pay with your credit card',
+      icon: <CreditCard size={20} />,
+    },
+  ];
+
+  const renderStepDetails = () => {
+    switch (step) {
+      case 'details':
+        return (
+          <FlashList
+            data={items}
+            renderItem={renderItem}
+            estimatedItemSize={132}
+            ItemSeparatorComponent={() => <View className="h-hairline bg-gray-200" />}
+            ListHeaderComponent={() => <Text className="text-2xl">Cart Items</Text>}
+            ListFooterComponent={() =>
+              !isPosDefaultCustomer ? (
+                <View className="mb-10 mt-4">
+                  <Text className="mb-6 text-2xl">Information</Text>
+
+                  {customerName && (
+                    <View className="mb-4 flex-row">
+                      <Text className="w-24 text-gray-300">Full Name</Text>
+                      <View className="flex-1">
+                        <Text>{customerName}</Text>
+                      </View>
+                    </View>
+                  )}
+                  <View className="flex-row">
+                    <Text className="w-24 text-gray-300">E-Mail</Text>
+                    <View className="flex-1">
+                      <Text>{customerEmail}</Text>
+                    </View>
+                  </View>
+                  {customerPhone && (
+                    <View className="mt-4 flex-row">
+                      <Text className="w-24 text-gray-300">Phone</Text>
+                      <View className="flex-1">
+                        <Text>{customerPhone}</Text>
+                      </View>
+                    </View>
+                  )}
+                </View>
+              ) : null
+            }
+            keyboardDismissMode="on-drag"
+          />
+        );
+      case 'payment':
+        return (
+          <>
+            <Text className="mb-6 text-2xl">Payment</Text>
+            <PaymentSelection methods={PAYMENT_METHODS} className="mb-auto" />
+          </>
+        );
+      default:
+        return null;
+    }
+  };
+
+  const renderStepButtons = () => {
+    switch (step) {
+      case 'details':
+        return (
+          <View className="pb-safe flex-row gap-2">
+            <Button variant="outline" className="flex-1" onPress={() => router.back()} disabled={!isDraftOrder}>
+              Back to Cart
+            </Button>
+            <Button className="flex-1" onPress={() => setStep('payment')} disabled={!isDraftOrder}>
+              Next: Payment
+            </Button>
+          </View>
+        );
+      case 'payment':
+        return (
+          <View className="pb-safe flex-row gap-2">
+            <Button
+              variant="outline"
+              className="flex-1"
+              onPress={() => setStep('details')}
+              disabled={!isDraftOrder || completeOrder.isPending}
+            >
+              Back: Details
+            </Button>
+            <Button
+              className="flex-1"
+              onPress={() => completeOrder.mutate()}
+              disabled={!isDraftOrder}
+              isPending={completeOrder.isPending}
+            >
+              Complete Order
+            </Button>
+          </View>
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
     <>
       <Layout>
         <Text className="mb-6 text-4xl">Checkout</Text>
-
-        <FlashList
-          data={items}
-          renderItem={renderItem}
-          estimatedItemSize={132}
-          ItemSeparatorComponent={() => <View className="h-hairline bg-gray-200" />}
-          ListHeaderComponent={() => <Text className="text-2xl">Cart Items</Text>}
-          ListFooterComponent={() =>
-            !isPosDefaultCustomer ? (
-              <View className="mb-10 mt-4">
-                <Text className="mb-6 text-2xl">Information</Text>
-
-                {customerName && (
-                  <View className="mb-4 flex-row">
-                    <Text className="w-24 text-gray-300">Full Name</Text>
-                    <View className="flex-1">
-                      <Text>{customerName}</Text>
-                    </View>
-                  </View>
-                )}
-                <View className="mb-4 flex-row">
-                  <Text className="w-24 text-gray-300">E-Mail</Text>
-                  <View className="flex-1">
-                    <Text>{customerEmail}</Text>
-                  </View>
-                </View>
-                {customerPhone && (
-                  <View className="flex-row">
-                    <Text className="w-24 text-gray-300">Phone</Text>
-                    <View className="flex-1">
-                      <Text>{customerPhone}</Text>
-                    </View>
-                  </View>
-                )}
-              </View>
-            ) : null
-          }
-        />
-
+        {renderStepDetails()}
         <View className="mb-6 gap-y-2 border-y border-gray-200 py-4">
           <View className="flex-row justify-between">
             <Text className="text-sm text-gray-400">Taxes</Text>
@@ -214,25 +290,7 @@ export default function CheckoutScreen() {
             })}
           </Text>
         </View>
-
-        <View className="pb-safe flex-row gap-2">
-          <Button
-            variant="outline"
-            className="flex-1"
-            onPress={() => router.back()}
-            disabled={!isDraftOrder || completeOrder.isPending}
-          >
-            Back to Cart
-          </Button>
-          <Button
-            className="flex-1"
-            onPress={() => completeOrder.mutate()}
-            disabled={!isDraftOrder}
-            isPending={completeOrder.isPending}
-          >
-            Complete Order
-          </Button>
-        </View>
+        {renderStepButtons()}
       </Layout>
 
       <Dialog
