@@ -1,0 +1,60 @@
+appId: host.exp.Exponent
+---
+- stopApp: host.exp.Exponent
+- openLink: 'exp://127.0.0.1:8081/'
+- waitForAnimationToEnd
+- runFlow:
+    when:
+      visible: Login
+    commands:
+      - longPressOn:
+          id: loginShopUrl
+      - longPressOn:
+          id: loginShopUrl
+      - tapOn: 'Select All'
+      - eraseText
+      - inputText: ${SHOP_URL}
+      - tapOn:
+          id: loginEmail
+      - inputText: ${USER_EMAIL}
+      - tapOn:
+          id: loginPassword
+      - inputText: ${USER_PASSWORD}
+      - assertVisible: Sign In
+      - tapOn: Sign In
+- tapOn: Search products...
+- inputText: Cypress Retreat
+- hideKeyboard
+- tapOn:
+    id: product-handle_cypress-retreat_image
+- waitForAnimationToEnd
+- tapOn: Violet
+- assertVisible: €2,000.00
+- tapOn:
+    id: quantity-increment
+- assertVisible: '2'
+- tapOn: Add to cart
+- assertVisible: Cart
+- assertVisible: Cypress Retreat
+- assertVisible: €1,800.00
+- assertVisible: €3,600.00
+- assertVisible: Add Customer
+- tapOn: Checkout
+- assertVisible: Checkout
+- assertVisible: Cypress Retreat
+- assertVisible: €1,800.00
+- assertVisible: €3,600.00
+- assertVisible: Complete Order
+- tapOn: Complete Order
+- assertVisible: Order confirmed!
+- assertVisible: The order has been placed successfully. You can track the order status on Orders screen.
+- assertVisible: View Order
+- assertVisible: Back to shop
+- tapOn: View Order
+- assertVisible: Order Details
+- assertVisible: 'Cypress Retreat Leather, Violet €3,600.00 Qty: 2'
+- assertVisible: Customer
+- assertVisible: No customer information available. This order was created on POS without a customer.
+- assertVisible: Summary
+- assertVisible: €3,600.00
+- assertVisible: Completed

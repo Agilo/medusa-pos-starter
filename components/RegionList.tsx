@@ -63,6 +63,7 @@ const RegionList: React.FC<RegionListProps> = ({ selectedRegionId, onRegionSelec
             />
           </TouchableOpacity>
         )}
+        keyboardDismissMode="on-drag"
       />
     </View>
   );

@@ -80,6 +80,7 @@ export const StockLocationList: React.FC<StockLocationListProps> = ({
             />
           </TouchableOpacity>
         )}
+        keyboardDismissMode="on-drag"
       />
     </View>
   );

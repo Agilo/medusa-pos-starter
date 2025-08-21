@@ -1,5 +1,5 @@
 import { clx } from '@/utils/clx';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { TextInput, TouchableOpacity, View } from 'react-native';
 import { Loader } from '../icons/loader';
 import { Minus } from '../icons/minus';
@@ -26,6 +26,12 @@ export function QuantityPicker({
   variant = 'default',
   className = '',
 }: QuantityPickerProps) {
+  const [inputValue, setInputValue] = useState(quantity.toString());
+
+  useEffect(() => {
+    setInputValue(quantity.toString());
+  }, [quantity]);
+
   const handleDecrement = () => {
     if (quantity > min && !disabled) {
       onQuantityChange(quantity - 1);
@@ -41,8 +47,9 @@ export function QuantityPicker({
   const handleInputChange = (text: string) => {
     if (disabled) return;
 
+    setInputValue(text);
+
     if (text === '') {
-      onQuantityChange(min);
       return;
     }
 
@@ -50,6 +57,22 @@ export function QuantityPicker({
 
     if (!isNaN(numValue) && numValue >= min && numValue <= max) {
       onQuantityChange(numValue);
+    }
+  };
+
+  const handleInputBlur = () => {
+    if (inputValue === '' || isNaN(parseInt(inputValue, 10))) {
+      setInputValue(min.toString());
+      onQuantityChange(min);
+    } else {
+      const numValue = parseInt(inputValue, 10);
+      if (numValue < min) {
+        setInputValue(min.toString());
+        onQuantityChange(min);
+      } else if (numValue > max) {
+        setInputValue(max.toString());
+        onQuantityChange(max);
+      }
     }
   };
 
@@ -85,8 +108,9 @@ export function QuantityPicker({
           )}
         >
           <TextInput
-            value={quantity.toString()}
+            value={inputValue}
             onChangeText={handleInputChange}
+            onBlur={handleInputBlur}
             keyboardType="numeric"
             textAlign="center"
             verticalAlign="middle"
@@ -103,6 +127,7 @@ export function QuantityPicker({
           className="w-8 items-center justify-center"
           onPress={handleIncrement}
           disabled={!canIncrement}
+          testID="quantity-increment"
         >
           <Plus
             size={variant === 'default' ? 16 : 24}

@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/Button';
+import { Layout } from '@/components/ui/Layout';
 import { Text } from '@/components/ui/Text';
 import React from 'react';
 import { View } from 'react-native';
@@ -9,7 +10,7 @@ interface WelcomeStepProps {
 
 export const WelcomeStep: React.FC<WelcomeStepProps> = ({ onComplete }) => {
   return (
-    <View className="flex-1 p-5">
+    <Layout className="pb-6">
       <Text className="mb-6 text-4xl">Welcome</Text>
       <Text className="mb-2 text-2xl">You&apos;re all set to start selling</Text>
       <Text className="mb-6 text-gray-600">
@@ -26,6 +27,6 @@ export const WelcomeStep: React.FC<WelcomeStepProps> = ({ onComplete }) => {
       <View className="flex-1" />
 
       <Button onPress={onComplete}>Get Started</Button>
-    </View>
+    </Layout>
   );
 };

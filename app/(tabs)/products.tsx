@@ -79,7 +79,10 @@ export default function ProductsScreen() {
           })}
         >
           <TouchableOpacity className="flex w-full gap-4" onPress={() => handleProductPress(item)} activeOpacity={0.7}>
-            <View className="aspect-square overflow-hidden rounded-lg bg-gray-200">
+            <View
+              className="aspect-square overflow-hidden rounded-lg bg-gray-200"
+              testID={`product-handle_${item.handle}_image`}
+            >
               {thumbnail && <Image source={{ uri: thumbnail }} className="h-full w-full object-cover" />}
             </View>
             <View>
@@ -141,7 +144,6 @@ export default function ProductsScreen() {
             <Text className="mt-2 text-center text-xl">No products match{'\n'}the search</Text>
           </View>
         }
-        contentContainerClassName="pb-4"
         ListFooterComponent={
           productsQuery.isFetchingNextPage ? (
             <View className="gap-6">
@@ -172,6 +174,7 @@ export default function ProductsScreen() {
           }
         }}
         showsVerticalScrollIndicator={false}
+        keyboardDismissMode="on-drag"
       />
     </Layout>
   );

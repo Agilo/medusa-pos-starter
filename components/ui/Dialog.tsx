@@ -6,11 +6,11 @@ import {
   GestureResponderEvent,
   Modal,
   ModalProps,
-  SafeAreaView,
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export interface DialogProps extends ModalProps {
   title?: string;
@@ -34,6 +34,7 @@ export const Dialog: React.FC<DialogProps> = ({
   containerClassName,
   contentClassName,
   headerClassName,
+  animationType = 'fade',
   onClose,
   onOverlayPress,
   onCloseIconPress,
@@ -75,17 +76,23 @@ export const Dialog: React.FC<DialogProps> = ({
   );
 
   return (
-    <Modal transparent={true} statusBarTranslucent {...modalProps} onRequestClose={onRequestClose}>
+    <Modal
+      transparent={true}
+      statusBarTranslucent
+      animationType={animationType}
+      {...modalProps}
+      onRequestClose={onRequestClose}
+    >
       <SafeAreaView className={clx('flex-1 items-center justify-center bg-black/50', className)}>
         <TouchableWithoutFeedback onPress={handleOverlayPress}>
           <View className="absolute inset-0" />
         </TouchableWithoutFeedback>
 
-        <View className="max-h-full w-full p-4">
+        <View className="max-h-full w-full items-center p-4">
           <View className={clx('max-h-full w-full overflow-hidden rounded-2xl bg-white p-4', containerClassName)}>
             {(title || showCloseButton) && (
               <View className={clx('mb-4 flex-row items-center justify-between gap-2', headerClassName)}>
-                {title && <Text>{title}</Text>}
+                {title && <Text className="text-xl">{title}</Text>}
                 {showCloseButton && (
                   <TouchableOpacity onPress={handleCloseIconPress} accessibilityLabel="Close dialog">
                     <X size={20} />

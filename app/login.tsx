@@ -119,6 +119,7 @@ export default function LoginScreen() {
             readOnly={auth.state.status === 'loading'}
             textContentType="URL"
             autoComplete="url"
+            testID="loginShopUrl"
           />
 
           <TextField
@@ -131,6 +132,7 @@ export default function LoginScreen() {
             readOnly={auth.state.status === 'loading'}
             textContentType="emailAddress"
             autoComplete="email"
+            testID="loginEmail"
           />
 
           <TextField
@@ -142,6 +144,7 @@ export default function LoginScreen() {
             readOnly={auth.state.status === 'loading'}
             textContentType="password"
             autoComplete="password"
+            testID="loginPassword"
           />
 
           <FormButton isPending={auth.state.status === 'loading'}>Sign In</FormButton>

@@ -1,17 +1,19 @@
 import { useAuthCtx } from '@/contexts/auth';
+import { useSettings } from '@/contexts/settings';
 import { SplashScreen } from 'expo-router';
-import { useEffect } from 'react';
+import * as React from 'react';
 
 SplashScreen.preventAutoHideAsync();
 
-export function SplashScreenController({ loaded }: { loaded: boolean }) {
-  const { state } = useAuthCtx();
+export function SplashScreenController() {
+  const auth = useAuthCtx();
+  const settings = useSettings();
 
-  useEffect(() => {
-    if (state.status !== 'loading' && loaded) {
+  React.useEffect(() => {
+    if (auth.state.status !== 'loading' && (!settings.isEnabled || settings.isSuccess)) {
       SplashScreen.hideAsync();
     }
-  }, [state.status, loaded]);
+  }, [auth.state.status, settings.isEnabled, settings.isSuccess]);
 
   return null;
 }

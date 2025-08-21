@@ -1,11 +1,11 @@
 import { ChevronDown } from '@/components/icons/chevron-down';
+import { BottomSheet } from '@/components/ui/BottomSheet';
 import { Text } from '@/components/ui/Text';
 import { clx } from '@/utils/clx';
 import React, { useEffect } from 'react';
 import { FieldError, useController, useFormContext } from 'react-hook-form';
 import { TouchableOpacity, View } from 'react-native';
 import Animated, { AnimatedStyle, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
-import { BottomSheet } from '../ui/BottomSheet';
 
 export interface SelectOption {
   label: string;
@@ -132,7 +132,10 @@ export function BaseSelectField({
       <View className="relative">
         {floatingPlaceholder && (
           <Animated.Text
-            className={clx('absolute left-3 z-10 text-base', error ? 'text-error-500' : 'text-gray-300')}
+            className={clx('absolute left-3 z-10 text-base text-gray-300', {
+              'text-error-500': error,
+              'text-gray-200': isDisabled && variant === 'primary',
+            })}
             style={floatingPlaceholderStyle}
             pointerEvents="none"
           >
@@ -150,6 +153,8 @@ export function BaseSelectField({
                 'pb-2 pt-6': floatingPlaceholder && variant === 'primary',
                 'bg-black': selectedOptions.length > 0 && variant === 'secondary',
                 'justify-center rounded-full py-3': variant === 'secondary',
+                'border-gray-200': isDisabled && variant === 'primary',
+                'bg-gray-100': isDisabled && variant === 'secondary',
               },
             )}
           >
@@ -170,7 +175,12 @@ export function BaseSelectField({
           </View>
         </TouchableOpacity>
 
-        <ChevronDown size={24} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-300" />
+        <ChevronDown
+          size={24}
+          className={clx('absolute right-4 top-1/2 -translate-y-1/2 text-gray-300', {
+            'text-gray-200': isDisabled && variant === 'primary',
+          })}
+        />
       </View>
 
       {error && <Text className={clx('mt-1 text-sm text-error-500', errorClassName)}>{error.message}</Text>}

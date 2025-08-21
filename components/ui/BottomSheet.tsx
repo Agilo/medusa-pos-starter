@@ -239,7 +239,7 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
           }}
         >
           <View
-            className={clx('w-full shrink grow-0 overflow-hidden rounded-2xl bg-white', containerClassName)}
+            className={clx('w-full shrink grow-0 overflow-hidden rounded-t-2xl bg-white', containerClassName)}
             style={{
               paddingBottom: keyboard.keyboardShown ? keyboard.keyboardHeight : 0,
             }}

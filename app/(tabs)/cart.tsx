@@ -24,6 +24,7 @@ import { SwipeableListItem } from '@/components/SwipeableListItem';
 import { Button } from '@/components/ui/Button';
 import { Dialog } from '@/components/ui/Dialog';
 import { Layout } from '@/components/ui/Layout';
+import { Prompt } from '@/components/ui/Prompt';
 import { QuantityPicker } from '@/components/ui/QuantityPicker';
 import { Text } from '@/components/ui/Text';
 import { useSettings } from '@/contexts/settings';
@@ -33,7 +34,7 @@ import { AnimatedFlashList as FlashList, ListRenderItem } from '@shopify/flash-l
 import { useIsMutating } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import * as React from 'react';
-import { Alert, Image, Pressable, TouchableOpacity, View } from 'react-native';
+import { Image, Pressable, TouchableOpacity, View } from 'react-native';
 import Animated, { SequencedTransition, SlideOutLeft } from 'react-native-reanimated';
 import { useSafeAreaFrame } from 'react-native-safe-area-context';
 import * as z from 'zod/v4';
@@ -390,6 +391,8 @@ export default function CartScreen() {
   const isUpdatingDraftOrder = useIsMutating({ mutationKey: ['draft-order'], exact: false });
   const itemsListRef = React.useRef<FlashListType<AdminOrderLineItem>>(null);
 
+  const [isDialogVisible, setIsDialogVisible] = React.useState(false);
+
   const onItemRemove = React.useCallback(
     (item: AdminOrderLineItem) => {
       updateDraftOrderItem.mutate({ id: item.id, update: { quantity: 0 } });
@@ -435,7 +438,7 @@ export default function CartScreen() {
 
   if (draftOrder.isError || settings.isError) {
     return (
-      <Layout>
+      <Layout className="pb-6">
         <Text className="text-4xl">Cart</Text>
         <View className="flex-1 items-center  justify-center gap-2">
           <InfoBanner variant="ghost" colorScheme="error" className="w-40">
@@ -458,7 +461,7 @@ export default function CartScreen() {
 
   if (!draftOrder.data?.draft_order || !draftOrder.data?.draft_order.items.length) {
     return (
-      <Layout>
+      <Layout className="pb-6">
         <Text className="text-4xl">Cart</Text>
         <View className="flex-1 items-center justify-center gap-1">
           <ShoppingCart size={24} />
@@ -504,21 +507,40 @@ export default function CartScreen() {
   ];
 
   return (
-    <Layout>
-      <Text className="mb-6 text-4xl">Cart</Text>
-      <CustomerBadge customer={draftOrder.data.draft_order.customer} />
-      <FlashList
-        ref={itemsListRef}
-        data={items}
-        keyExtractor={(item) => item.id}
-        estimatedItemSize={132}
-        renderItem={renderItem}
-        getItemType={(item) => item.__type__}
-        ItemSeparatorComponent={() => <View className="h-hairline bg-gray-200" />}
-        CellRendererComponent={ItemCell}
-        disableAutoLayout
-        ListFooterComponent={() =>
-          draftOrder.data && (windowDimensions.width < 768 || windowDimensions.height < 900) ? (
+    <>
+      <Layout className="pb-6">
+        <Text className="mb-6 text-4xl">Cart</Text>
+        <CustomerBadge customer={draftOrder.data.draft_order.customer} />
+        <FlashList
+          ref={itemsListRef}
+          data={items}
+          keyExtractor={(item) => item.id}
+          estimatedItemSize={132}
+          renderItem={renderItem}
+          getItemType={(item) => item.__type__}
+          ItemSeparatorComponent={() => <View className="h-hairline bg-gray-200" />}
+          CellRendererComponent={ItemCell}
+          disableAutoLayout
+          ListFooterComponent={() =>
+            draftOrder.data && (windowDimensions.width < 768 || windowDimensions.height < 900) ? (
+              <CartSummaryHeader
+                onAddPromotion={(code) => addPromotion.mutate(code)}
+                isAddingPromotion={addPromotion.isPending}
+                isLoading={draftOrder.isFetching || isUpdatingDraftOrder > 0}
+                taxTotal={draftOrder.data.draft_order.tax_total}
+                subtotal={draftOrder.data.draft_order.subtotal}
+                discountTotal={draftOrder.data.draft_order.discount_total}
+                currencyCode={
+                  draftOrder.data?.draft_order.region?.currency_code || settings.data?.region?.currency_code
+                }
+              />
+            ) : null
+          }
+          showsVerticalScrollIndicator={false}
+          keyboardDismissMode="on-drag"
+        />
+        <View>
+          {windowDimensions.width >= 768 && windowDimensions.height >= 900 && (
             <CartSummaryHeader
               onAddPromotion={(code) => addPromotion.mutate(code)}
               isAddingPromotion={addPromotion.isPending}
@@ -528,79 +550,58 @@ export default function CartScreen() {
               discountTotal={draftOrder.data.draft_order.discount_total}
               currencyCode={draftOrder.data?.draft_order.region?.currency_code || settings.data?.region?.currency_code}
             />
-          ) : null
-        }
-        showsVerticalScrollIndicator={false}
-      />
-
-      <View className="pb-2.5">
-        {windowDimensions.width >= 768 && windowDimensions.height >= 900 && (
-          <CartSummaryHeader
-            onAddPromotion={(code) => addPromotion.mutate(code)}
-            isAddingPromotion={addPromotion.isPending}
-            isLoading={draftOrder.isFetching || isUpdatingDraftOrder > 0}
-            taxTotal={draftOrder.data.draft_order.tax_total}
-            subtotal={draftOrder.data.draft_order.subtotal}
-            discountTotal={draftOrder.data.draft_order.discount_total}
-            currencyCode={draftOrder.data?.draft_order.region?.currency_code || settings.data?.region?.currency_code}
-          />
-        )}
-        <View className="mb-4 h-hairline bg-gray-200" />
-        <View className="mb-6 flex-row justify-between">
-          <Text className="text-lg">Total</Text>
-          {draftOrder.isFetching || isUpdatingDraftOrder > 0 ? (
-            <View className="h-7 w-1/4 rounded-md bg-gray-200" />
-          ) : (
-            <Text className="text-lg">
-              {draftOrder.data.draft_order.total?.toLocaleString('en-US', {
-                style: 'currency',
-                currency: draftOrder.data.draft_order.region?.currency_code || settings.data?.region?.currency_code,
-                currencyDisplay: 'narrowSymbol',
-              })}
-            </Text>
           )}
-        </View>
-        <View className="flex-row gap-2">
-          <Button
-            variant="outline"
-            className="flex-1"
-            onPress={() => {
-              Alert.alert('Cancel Cart', 'Are you sure you want to cancel the cart?', [
-                {
-                  text: 'No',
-                  style: 'cancel',
-                },
-                {
-                  text: 'Yes',
-                  isPreferred: true,
-                  onPress: () => {
-                    cancelDraftOrder.mutate();
-                  },
-                  style: 'destructive',
-                },
-              ]);
-            }}
-            isPending={cancelDraftOrder.isPending}
-            disabled={draftOrder.isFetching || isUpdatingDraftOrder > 0}
-          >
-            Cancel Cart
-          </Button>
-          <Button
-            className="flex-1"
-            disabled={
-              draftOrder.data.draft_order.items.length === 0 || draftOrder.isFetching || isUpdatingDraftOrder > 0
-            }
-            onPress={() => {
-              if (!draftOrder.data?.draft_order.id) {
-                return;
+          <View className="mb-4 h-hairline bg-gray-200" />
+          <View className="mb-6 flex-row justify-between">
+            <Text className="text-lg">Total</Text>
+            {draftOrder.isFetching || isUpdatingDraftOrder > 0 ? (
+              <View className="h-7 w-1/4 rounded-md bg-gray-200" />
+            ) : (
+              <Text className="text-lg">
+                {draftOrder.data.draft_order.total?.toLocaleString('en-US', {
+                  style: 'currency',
+                  currency: draftOrder.data.draft_order.region?.currency_code || settings.data?.region?.currency_code,
+                  currencyDisplay: 'narrowSymbol',
+                })}
+              </Text>
+            )}
+          </View>
+          <View className="flex-row gap-2">
+            <Button
+              variant="outline"
+              className="flex-1"
+              onPress={() => setIsDialogVisible(true)}
+              isPending={cancelDraftOrder.isPending}
+              disabled={draftOrder.isFetching || isUpdatingDraftOrder > 0}
+            >
+              Cancel Cart
+            </Button>
+            <Button
+              className="flex-1"
+              disabled={
+                draftOrder.data.draft_order.items.length === 0 || draftOrder.isFetching || isUpdatingDraftOrder > 0
               }
-              router.push(`/checkout/${draftOrder.data.draft_order.id}`);
-            }}
-          >
-            Checkout
-          </Button>
+              onPress={() => {
+                if (!draftOrder.data?.draft_order.id) {
+                  return;
+                }
+                router.push(`/checkout/${draftOrder.data.draft_order.id}`);
+              }}
+            >
+              Checkout
+            </Button>
+          </View>
         </View>
-      </View>
-    </Layout>
+      </Layout>
+
+      <Prompt
+        onSubmit={() => cancelDraftOrder.mutate()}
+        onClose={() => setIsDialogVisible(false)}
+        title="Are you sure you want to cancel the cart?"
+        visible={isDialogVisible}
+        showCloseButton={false}
+        dismissOnOverlayPress={false}
+      />
+    </>
   );
 }

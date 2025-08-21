@@ -200,7 +200,7 @@ export default function OrdersScreen() {
             <Text className="mt-2 text-center text-xl">No orders match{'\n'}the search</Text>
           </View>
         }
-        contentContainerClassName="pb-4"
+        contentContainerClassName="pb-2"
         ListFooterComponent={
           ordersQuery.isFetchingNextPage ? (
             <View className="mt-4 gap-4">
@@ -231,6 +231,7 @@ export default function OrdersScreen() {
           }
         }}
         showsVerticalScrollIndicator={false}
+        keyboardDismissMode="on-drag"
       />
     </Layout>
   );

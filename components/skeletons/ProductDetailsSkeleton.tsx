@@ -1,18 +1,10 @@
-import { BottomSheet } from '@/components/ui/BottomSheet';
 import { QuantityPicker } from '@/components/ui/QuantityPicker';
 import { Text } from '@/components/ui/Text';
-import { router } from 'expo-router';
 import React from 'react';
 import { TouchableOpacity, View } from 'react-native';
 
 export const ProductDetailsSkeleton = () => (
-  <BottomSheet
-    visible={true}
-    onClose={() => router.back()}
-    showCloseButton={false}
-    dismissOnOverlayPress
-    contentClassName="pb-safe-offset-4"
-  >
+  <>
     <View className="mb-4 aspect-[4/3] w-full rounded-xl bg-gray-200" />
 
     <View className="mb-2 flex-row items-center gap-14">
@@ -36,5 +28,5 @@ export const ProductDetailsSkeleton = () => (
         <Text className="mx-auto text-xl leading-5 text-gray-300">Add to cart</Text>
       </TouchableOpacity>
     </View>
-  </BottomSheet>
+  </>
 );

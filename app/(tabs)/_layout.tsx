@@ -8,6 +8,10 @@ import { Settings } from '@/components/icons/settings';
 import { ShoppingCart } from '@/components/icons/shopping-cart';
 import { Store } from '@/components/icons/store';
 
+export const unstable_settings = {
+  initialRouteName: 'products',
+};
+
 export default function TabLayout() {
   const draftOrder = useCurrentDraftOrder();
 

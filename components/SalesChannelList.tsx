@@ -55,6 +55,7 @@ const SalesChannelList: React.FC<SalesChannelListProps> = ({ selectedSalesChanne
             />
           </TouchableOpacity>
         )}
+        keyboardDismissMode="on-drag"
       />
     </View>
   );

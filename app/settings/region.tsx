@@ -13,7 +13,7 @@ export default function RegionScreen() {
   const [selectedRegion, setSelectedRegion] = React.useState(settings.data?.region?.id || '');
 
   return (
-    <Layout className="pb-2.5">
+    <Layout className="pb-6">
       <Text className="mb-6 text-4xl">Setting Up</Text>
       <Text className="mb-2 text-2xl">Choose a region</Text>
       <Text className="mb-6 text-gray-300">

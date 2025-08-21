@@ -7,8 +7,8 @@ import { FulfillmentStatus, OrderStatus, PaymentStatus } from '@/components/ui/O
 import { Text } from '@/components/ui/Text';
 import { useSettings } from '@/contexts/settings';
 import { AdminOrder, AdminOrderLineItem } from '@medusajs/types';
-import { router, useLocalSearchParams } from 'expo-router';
-import React, { useEffect } from 'react';
+import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
+import React from 'react';
 import { FlatList, Image, TouchableOpacity, View } from 'react-native';
 
 const CustomerInformation: React.FC<{
@@ -215,7 +215,7 @@ const OrderInformation: React.FC<{
         </View>
       </View>
       <View className="my-4 h-hairline w-full bg-gray-200" />
-      <View className="mb-4 flex-row items-center justify-between gap-4">
+      <View className="flex-row items-center justify-between gap-4">
         <View className="flex-1">
           <Text className="text-lg">Total</Text>
         </View>
@@ -233,7 +233,7 @@ const OrderInformation: React.FC<{
   );
 };
 
-export default function OrderDetailsScreen() {
+const OrderDetails: React.FC<{ animateOut: (callback?: () => void) => void }> = ({ animateOut }) => {
   const { orderId, orderNumber, orderDate } = useLocalSearchParams<{
     orderId: string;
     orderNumber: string;
@@ -242,7 +242,6 @@ export default function OrderDetailsScreen() {
 
   const settings = useSettings();
   const orderQuery = useOrder(orderId);
-  const [visible, setVisible] = React.useState(false);
 
   const currency =
     orderQuery.data?.order.currency_code ||
@@ -250,11 +249,26 @@ export default function OrderDetailsScreen() {
     settings.data?.region?.currency_code ||
     'EUR';
 
+  const handleProductPress = React.useCallback(
+    (product: AdminOrderLineItem) => {
+      animateOut(() => {
+        router.push({
+          pathname: '/product-details',
+          params: {
+            productId: product.product_id,
+            productName: product.product_title,
+          },
+        });
+      });
+    },
+    [animateOut],
+  );
+
   const renderItem = React.useCallback(
     ({ item }: { item: AdminOrderLineItem }) => {
       const thumbnail = item.thumbnail || item.product?.thumbnail || item.product?.images?.[0]?.url;
       return (
-        <TouchableOpacity className="flex-row gap-4">
+        <TouchableOpacity className="flex-row gap-4" onPress={() => handleProductPress(item)}>
           <View className="aspect-square h-16 overflow-hidden rounded-lg bg-gray-300">
             {thumbnail && <Image source={{ uri: thumbnail }} className="h-full w-full object-cover" />}
           </View>
@@ -279,19 +293,11 @@ export default function OrderDetailsScreen() {
         </TouchableOpacity>
       );
     },
-    [currency],
+    [currency, handleProductPress],
   );
 
-  useEffect(() => {
-    setTimeout(() => {
-      requestAnimationFrame(() => {
-        setVisible(true);
-      });
-    }, 100);
-  }, []);
-
   return (
-    <BottomSheet visible={visible} onClose={() => router.back()} showCloseButton={false} dismissOnOverlayPress>
+    <>
       <View className="mb-4 flex-row items-center justify-between gap-4">
         <Text className="text-2xl">Order #{orderNumber}</Text>
         <Text className="text-gray-300">{orderDate}</Text>
@@ -318,16 +324,47 @@ export default function OrderDetailsScreen() {
           renderItem={renderItem}
           ItemSeparatorComponent={() => <View className="my-6 h-hairline w-full bg-gray-200" />}
           className="shrink grow-0"
-          contentContainerClassName="pt-4 grow-0 pb-safe-offset-4"
+          contentContainerClassName="pt-4 grow-0 pb-safe-offset-6"
           ListFooterComponentClassName="mt-14"
           ListFooterComponent={<OrderInformation order={orderQuery.data.order} currency={currency} />}
           showsVerticalScrollIndicator={false}
+          keyboardDismissMode="on-drag"
         />
       ) : (
         <View className="py-11">
           <InfoBanner colorScheme="error">An unknown error occurred while fetching the order details.</InfoBanner>
         </View>
       )}
+    </>
+  );
+};
+
+export default function OrderDetailsScreen() {
+  const [visible, setVisible] = React.useState(false);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      setVisible(false);
+
+      const timeoutId = setTimeout(() => {
+        requestAnimationFrame(() => {
+          setVisible(true);
+        });
+      }, 100);
+
+      return () => {
+        clearTimeout(timeoutId);
+      };
+    }, []),
+  );
+
+  const renderContent = React.useCallback(({ animateOut }: { animateOut: (callback?: () => void) => void }) => {
+    return <OrderDetails animateOut={animateOut} />;
+  }, []);
+
+  return (
+    <BottomSheet visible={visible} onClose={() => router.back()} showCloseButton={false} dismissOnOverlayPress>
+      {renderContent}
     </BottomSheet>
   );
 }

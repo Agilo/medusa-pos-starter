@@ -43,6 +43,7 @@ export function MultiSelectField({
   errorClassName = '',
   searchable = false,
   floatingPlaceholder = false,
+  isDisabled = false,
   variant = 'primary',
 }: BaseSelectProps) {
   const toggleOption = React.useCallback(
@@ -125,6 +126,7 @@ export function MultiSelectField({
               </Text>
             </View>
           }
+          keyboardDismissMode="on-drag"
         />
       </>
     );
@@ -144,6 +146,7 @@ export function MultiSelectField({
       getSelectedOptions={getSelectedOptions}
       shouldShowFloating={shouldShowFloating}
       renderOptionsList={renderOptionsList}
+      isDisabled={isDisabled}
     >
       {({ selectedOptions, value, onChange, placeholder: pl, floatingPlaceholder: fp, variant }) => {
         const removeOpt = removeOption(value, onChange);
@@ -153,16 +156,24 @@ export function MultiSelectField({
             {selectedOptions.length > 0 && variant === 'primary' ? (
               <View className="flex flex-row flex-wrap gap-1">
                 {selectedOptions.map((option) => (
-                  <View key={option.value} className="mb-1 mr-1 flex-row items-center rounded-lg bg-gray-100 px-2 py-1">
-                    <Text className="text-sm text-gray-700">{option.label}</Text>
+                  <View
+                    key={option.value}
+                    className={clx('mb-1 mr-1 flex-row items-center rounded-lg bg-gray-100 px-2 py-1', {
+                      'bg-gray-50': isDisabled,
+                    })}
+                  >
+                    <Text className={clx('text-sm text-gray-700', { 'text-gray-200': isDisabled })}>
+                      {option.label}
+                    </Text>
                     <TouchableOpacity
+                      disabled={isDisabled}
                       onPress={(e) => {
                         e.stopPropagation();
                         removeOpt(option.value);
                       }}
                       className="ml-1"
                     >
-                      <X size={12} className="text-gray-600" />
+                      <X size={12} className={clx('text-gray-600', { 'text-gray-200': isDisabled })} />
                     </TouchableOpacity>
                   </View>
                 ))}

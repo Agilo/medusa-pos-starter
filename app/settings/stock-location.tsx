@@ -13,7 +13,7 @@ export default function StockLocationScreen() {
   const [selectedStockLocation, setSelectedStockLocation] = React.useState(settings.data?.stock_location?.id || '');
 
   return (
-    <Layout className="pb-2.5">
+    <Layout className="pb-6">
       <Text className="mb-6 text-4xl">Setting Up</Text>
       <Text className="mb-2 text-2xl">Select stock location</Text>
       <Text className="mb-6 text-gray-300">

@@ -163,6 +163,7 @@ export const MultiSelectFilter: React.FC<MultiSelectFilterProps> = ({
               </Text>
             </View>
           }
+          keyboardDismissMode="on-drag"
         />
       </BottomSheet>
     </View>
