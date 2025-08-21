@@ -4,7 +4,7 @@ import {
   useCurrentDraftOrder,
   useDraftOrderOrOrder,
 } from '@/api/hooks/draft-orders';
-import { CreditCard } from '@/components/icons/creadit-card';
+import { CreditCard } from '@/components/icons/credit-card';
 import { ShoppingCart } from '@/components/icons/shopping-cart';
 import { Wallet } from '@/components/icons/wallet';
 import { InfoBanner } from '@/components/InfoBanner';
