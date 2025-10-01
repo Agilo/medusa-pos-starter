@@ -121,7 +121,7 @@ export default function RootLayout() {
           <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
             <SplashScreenController />
             <AppStatusBar />
-            <GestureHandlerRootView>
+            <GestureHandlerRootView style={{ flex: 1 }}>
               <KeyboardProvider>
                 <App />
               </KeyboardProvider>
