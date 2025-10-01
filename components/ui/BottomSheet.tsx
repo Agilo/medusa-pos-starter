@@ -5,7 +5,7 @@ import { clx } from '@/utils/clx';
 import { useKeyboard } from '@react-native-community/hooks';
 import React from 'react';
 import { GestureResponderEvent, Modal, ModalProps, TouchableOpacity, View } from 'react-native';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
 import Animated, { useAnimatedStyle, useSharedValue, withDecay, withSpring, withTiming } from 'react-native-reanimated';
 import { useSafeAreaFrame, useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
@@ -163,75 +163,79 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
       visible={modalProps.visible}
       onRequestClose={onRequestClose}
     >
-      <Animated.View
-        className={clx('flex-1 items-center justify-end bg-black/50', className)}
-        style={[
-          {
-            paddingLeft: safeAreaInsets.left,
-            paddingRight: safeAreaInsets.right,
-          },
-          overlayStyle,
-        ]}
-      >
-        <GestureDetector gesture={overlayTapGesture}>
-          <View className="absolute inset-0" />
-        </GestureDetector>
-
-        <View
-          className="w-full flex-1"
-          style={{
-            paddingTop: safeAreaInsets.top,
-          }}
-          pointerEvents="none"
-        >
-          <View className="h-4 w-full" />
-        </View>
-
+      <GestureHandlerRootView style={{ flex: 1 }}>
         <Animated.View
-          className="w-full shrink grow-0"
+          className={clx('flex-1 items-center justify-end bg-black/50', className)}
           style={[
             {
-              maxHeight: windowDimensions.height - safeAreaInsets.bottom - safeAreaInsets.top - 16,
+              paddingLeft: safeAreaInsets.left,
+              paddingRight: safeAreaInsets.right,
             },
-            sheetStyle,
+            overlayStyle,
           ]}
         >
+          <GestureDetector gesture={overlayTapGesture}>
+            <View className="absolute inset-0" />
+          </GestureDetector>
+
           <View
-            className={clx('w-full shrink grow-0 overflow-hidden rounded-t-2xl bg-white', containerClassName)}
+            className="w-full flex-1"
             style={{
-              paddingBottom: keyboard.keyboardShown ? keyboard.keyboardHeight : 0,
+              paddingTop: safeAreaInsets.top,
             }}
+            pointerEvents="none"
           >
-            <GestureDetector gesture={panGesture}>
-              <View className="w-full shrink-0 grow-0 items-center py-2">
-                <View className="h-1 w-10 rounded-full bg-gray-200" />
-              </View>
-            </GestureDetector>
-
-            {(title || showCloseButton) && (
-              <View className={clx('shrink-0 grow-0 flex-row items-center justify-between gap-2 p-4', headerClassName)}>
-                <View className="flex-1">{title && <Text>{title}</Text>}</View>
-                {showCloseButton && (
-                  <TouchableOpacity onPress={handleCloseIconPress} accessibilityLabel="Close dialog">
-                    <X size={20} />
-                  </TouchableOpacity>
-                )}
-              </View>
-            )}
-
-            {!title && !showCloseButton && (
-              <GestureDetector gesture={panGesture}>
-                <View className="h-8 shrink-0 grow-0" />
-              </GestureDetector>
-            )}
-
-            <View className={clx('shrink grow-0 px-4', contentClassName)}>
-              {typeof children === 'function' ? children({ animateOut }) : children}
-            </View>
+            <View className="h-4 w-full" />
           </View>
-          <Toast config={toastConfig} />
+
+          <Animated.View
+            className="w-full shrink grow-0"
+            style={[
+              {
+                maxHeight: windowDimensions.height - safeAreaInsets.bottom - safeAreaInsets.top - 16,
+              },
+              sheetStyle,
+            ]}
+          >
+            <View
+              className={clx('w-full shrink grow-0 overflow-hidden rounded-t-2xl bg-white', containerClassName)}
+              style={{
+                paddingBottom: keyboard.keyboardShown ? keyboard.keyboardHeight : 0,
+              }}
+            >
+              <GestureDetector gesture={panGesture}>
+                <View className="w-full shrink-0 grow-0 items-center py-2">
+                  <View className="h-1 w-10 rounded-full bg-gray-200" />
+                </View>
+              </GestureDetector>
+
+              {(title || showCloseButton) && (
+                <View
+                  className={clx('shrink-0 grow-0 flex-row items-center justify-between gap-2 p-4', headerClassName)}
+                >
+                  <View className="flex-1">{title && <Text>{title}</Text>}</View>
+                  {showCloseButton && (
+                    <TouchableOpacity onPress={handleCloseIconPress} accessibilityLabel="Close dialog">
+                      <X size={20} />
+                    </TouchableOpacity>
+                  )}
+                </View>
+              )}
+
+              {!title && !showCloseButton && (
+                <GestureDetector gesture={panGesture}>
+                  <View className="h-8 shrink-0 grow-0" />
+                </GestureDetector>
+              )}
+
+              <View className={clx('shrink grow-0 px-4', contentClassName)}>
+                {typeof children === 'function' ? children({ animateOut }) : children}
+              </View>
+            </View>
+            <Toast config={toastConfig} />
+          </Animated.View>
         </Animated.View>
-      </Animated.View>
+      </GestureHandlerRootView>
     </Modal>
   );
 };

@@ -11,7 +11,6 @@ import { AdminProductImage } from '@medusajs/types';
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import * as React from 'react';
 import { Image, ScrollView, View } from 'react-native';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useSharedValue } from 'react-native-reanimated';
 import Carousel, { CarouselRenderItem, ICarouselInstance, Pagination } from 'react-native-reanimated-carousel';
 import { useSafeAreaFrame } from 'react-native-safe-area-context';
@@ -324,10 +323,8 @@ export default function ProductDetailsScreen() {
   }, []);
 
   return (
-    <GestureHandlerRootView>
-      <BottomSheet visible={visible} onClose={() => router.back()} showCloseButton={false} dismissOnOverlayPress>
-        {renderContent}
-      </BottomSheet>
-    </GestureHandlerRootView>
+    <BottomSheet visible={visible} onClose={() => router.back()} showCloseButton={false} dismissOnOverlayPress>
+      {renderContent}
+    </BottomSheet>
   );
 }
